@@ -1,25 +1,16 @@
-
-name: Run Telegram Bot
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/15 * * * *"
-
-jobs:
-  run-bot:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Restore seen news
+        uses: actions/cache@v4
         with:
-          python-version: "3.11"
+          path: seen.json
+          key: seen-news-${{ github.run_id }}
+          restore-keys: |
+            seen-news-
 
-      - name: Install dependencies
-        run: pip install requests
+      - name: Initialize news history
+        run: |
+          if [ ! -f seen.json ]; then
+            echo "[]" > seen.json
+          fi
 
       - name: Run bot
         env:
